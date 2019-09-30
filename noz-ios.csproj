@@ -38,13 +38,12 @@
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppDelegate.cs" />
+    <Compile Include="IOSAppDelegate.cs" />
     <Compile Include="IOSAudioClip.cs" />
     <Compile Include="IOSAudioDriver.cs" />
     <Compile Include="IOSWindow.cs" />
     <Compile Include="IOSGraphicsDriver.cs" />
-    <Compile Include="IOSProgram.cs" />
-    <Compile Include="ProgramContext.cs" />
+    <Compile Include="IOSApplication.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

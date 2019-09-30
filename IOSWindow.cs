@@ -30,6 +30,7 @@ using GLKit;
 
 using System.Diagnostics;
 using System;
+using NoZ.Platform.OpenGL;
 
 namespace NoZ.Platform.IOS
 {
@@ -45,25 +46,25 @@ namespace NoZ.Platform.IOS
         public override void TouchesBegan(NSSet touches, UIEvent evt)
         {
             base.TouchesBegan(touches, evt);
-            _window.OnTouchesBegan(touches);
+            //_window.OnTouchesBegan(touches);
         }
 
         public override void TouchesMoved(NSSet touches, UIEvent evt)
         {
             base.TouchesMoved(touches, evt);
-            _window.OnTouchesMoved(touches);
+            //_window.OnTouchesMoved(touches);
         }
 
         public override void TouchesEnded(NSSet touches, UIEvent evt)
         {
             base.TouchesEnded(touches, evt);
-            _window.OnTouchesEnded(touches);
+            //_window.OnTouchesEnded(touches);
         }
 
         public override void TouchesCancelled(NSSet touches, UIEvent evt)
         {
             base.TouchesCancelled(touches, evt);
-            _window.OnTouchesCancelled(touches);
+            //_window.OnTouchesCancelled(touches);
         }
 
         public override bool CanBecomeFirstResponder => true;
@@ -82,7 +83,7 @@ namespace NoZ.Platform.IOS
         }
     }
 
-    internal class IOSGameWindow : Window
+    internal class IOSGameWindow : IWindowDriver
     {
         public EAGLContext GLContext {
             get; set;
@@ -92,7 +93,7 @@ namespace NoZ.Platform.IOS
             get; set;
         }
 
-        public override Vector2Int Size => _displaySize;
+        public Vector2Int Size => _displaySize;
 
         private uint _renderBufferId;
         private uint _frameBufferId;
@@ -139,15 +140,19 @@ namespace NoZ.Platform.IOS
 
             var link = CADisplayLink.Create(() =>
             {
-                Game.Instance.Frame();
+                Application.Step();
             });
+
             link.PreferredFramesPerSecond = 60;
 
             link.AddToRunLoop(NSRunLoop.Main, NSRunLoopMode.Default);
         }
 
-#if false
-        protected override void OnBeginFrame()
+        public void Show()
+        {
+        }
+
+        public void DrawBegin()
         {
             _stopwatch.Start();
             _stopwatch2.Restart();
@@ -156,12 +161,12 @@ namespace NoZ.Platform.IOS
             GL.BindFrameBuffer(_frameBufferId);
         }
 
-        protected override void OnEndFrame()
+        public void DrawEnd()
         {
             GL.BindRenderBuffer(_renderBufferId);
             GLContext.PresentRenderBuffer((uint)GL.Imports.GL_RENDERBUFFER);
 
-
+#if false
             _stopwatch2.Stop();
 
             if (_stopwatch.ElapsedMilliseconds > 1000)
@@ -191,8 +196,8 @@ namespace NoZ.Platform.IOS
                 maxElapsed = Math.Max(maxElapsed, _stopwatch2.Elapsed.TotalMilliseconds);
                 avgElapsed += _stopwatch2.Elapsed.TotalMilliseconds;
             }
-        }
 #endif
+        }
 
         private Stopwatch _stopwatch;
         private Stopwatch _stopwatch2;

@@ -22,20 +22,15 @@
   SOFTWARE.
 */
 
-using NoZ.Platform.OpenGL;
+using UIKit;
 
-namespace NoZ.Platform.IOS {
-#if false
-    class IOSGraphicsDriver : OpenGLDriver {
-        private static Cursor _fakeCursor = new Cursor();
-
-        public override Cursor CreateCursor(Image image) {
-            return _fakeCursor;
-        }
-
-        public override Cursor CreateCursor(SystemCursor systemCursor) {
-            return _fakeCursor;
+namespace NoZ.Platform.IOS
+{
+    public static class IOSApplication
+    {
+        public static void Run()
+        {
+            UIApplication.Main(null, null, "IOSAppDelegate");
         }
     }
-#endif
 }
