@@ -1,55 +1,89 @@
-﻿using Foundation;
+﻿/*
+  NoZ Game Engine
+
+  Copyright(c) 2019 NoZ Games, LLC
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files(the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions :
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+*/
+
+using Foundation;
 using CoreAnimation;
 using UIKit;
 using OpenGLES;
 using GLKit;
 
-using NoZ.Platform.OpenGL;
 using System.Diagnostics;
 using System;
 
-namespace NoZ.Platform.IOS {
-    internal class NozView : GLKView {
+namespace NoZ.Platform.IOS
+{
+    internal class NozView : GLKView
+    {
         private IOSGameWindow _window;
 
-        internal NozView(IOSGameWindow window, CoreGraphics.CGRect rect) : base(rect) {
+        internal NozView(IOSGameWindow window, CoreGraphics.CGRect rect) : base(rect)
+        {
             _window = window;
         }
 
-        public override void TouchesBegan(NSSet touches, UIEvent evt) {
+        public override void TouchesBegan(NSSet touches, UIEvent evt)
+        {
             base.TouchesBegan(touches, evt);
             _window.OnTouchesBegan(touches);
         }
 
-        public override void TouchesMoved(NSSet touches, UIEvent evt) {
+        public override void TouchesMoved(NSSet touches, UIEvent evt)
+        {
             base.TouchesMoved(touches, evt);
             _window.OnTouchesMoved(touches);
         }
 
-        public override void TouchesEnded(NSSet touches, UIEvent evt) {
+        public override void TouchesEnded(NSSet touches, UIEvent evt)
+        {
             base.TouchesEnded(touches, evt);
             _window.OnTouchesEnded(touches);
         }
 
-        public override void TouchesCancelled(NSSet touches, UIEvent evt) {
+        public override void TouchesCancelled(NSSet touches, UIEvent evt)
+        {
             base.TouchesCancelled(touches, evt);
-            _window.OnTouchesCancelled (touches);
+            _window.OnTouchesCancelled(touches);
         }
 
         public override bool CanBecomeFirstResponder => true;
     }
 
-    public class NozNavigationController : UINavigationController {
-        public NozNavigationController() {
+    public class NozNavigationController : UINavigationController
+    {
+        public NozNavigationController()
+        {
             NavigationBarHidden = true;
         }
 
-        public override bool PrefersStatusBarHidden() {
+        public override bool PrefersStatusBarHidden()
+        {
             return true;
         }
     }
 
-    internal class IOSGameWindow : GameWindow {
+    internal class IOSGameWindow : Window
+    {
         public EAGLContext GLContext {
             get; set;
         }
@@ -65,7 +99,8 @@ namespace NoZ.Platform.IOS {
         private NozView _view;
         private Vector2Int _displaySize;
 
-        public IOSGameWindow (AppDelegate appDelegate) {
+        public IOSGameWindow(AppDelegate appDelegate)
+        {
             _displaySize = new Vector2Int(
                 (int)UIScreen.MainScreen.NativeBounds.Size.Width,
                 (int)UIScreen.MainScreen.NativeBounds.Size.Height
@@ -73,7 +108,6 @@ namespace NoZ.Platform.IOS {
 
             _stopwatch = new Stopwatch();
             _stopwatch2 = new Stopwatch();
-
 
             // Create the window
             Window = new UIWindow(UIScreen.MainScreen.Bounds);
@@ -103,7 +137,8 @@ namespace NoZ.Platform.IOS {
             GL.BindFrameBuffer(_frameBufferId);
             GL.FrameBufferRenderBuffer(_renderBufferId);
 
-            var link = CADisplayLink.Create(() => {
+            var link = CADisplayLink.Create(() =>
+            {
                 Game.Instance.Frame();
             });
             link.PreferredFramesPerSecond = 60;
@@ -111,7 +146,9 @@ namespace NoZ.Platform.IOS {
             link.AddToRunLoop(NSRunLoop.Main, NSRunLoopMode.Default);
         }
 
-        protected override void OnBeginFrame() {
+#if false
+        protected override void OnBeginFrame()
+        {
             _stopwatch.Start();
             _stopwatch2.Restart();
 
@@ -119,14 +156,16 @@ namespace NoZ.Platform.IOS {
             GL.BindFrameBuffer(_frameBufferId);
         }
 
-        protected override void OnEndFrame() {
+        protected override void OnEndFrame()
+        {
             GL.BindRenderBuffer(_renderBufferId);
             GLContext.PresentRenderBuffer((uint)GL.Imports.GL_RENDERBUFFER);
 
 
             _stopwatch2.Stop();
 
-            if (_stopwatch.ElapsedMilliseconds > 1000) {
+            if (_stopwatch.ElapsedMilliseconds > 1000)
+            {
                 _stopwatch.Stop();
 
                 var lastFPS = (((double)frameCount) / (avgElapsed / 1000.0));
@@ -143,7 +182,9 @@ namespace NoZ.Platform.IOS {
                 minElapsed = 100000;
                 maxElapsed = 0;
                 avgElapsed = 0;
-            } else {
+            }
+            else
+            {
 
                 frameCount++;
                 minElapsed = Math.Min(minElapsed, _stopwatch2.Elapsed.TotalMilliseconds);
@@ -151,6 +192,7 @@ namespace NoZ.Platform.IOS {
                 avgElapsed += _stopwatch2.Elapsed.TotalMilliseconds;
             }
         }
+#endif
 
         private Stopwatch _stopwatch;
         private Stopwatch _stopwatch2;
@@ -159,51 +201,58 @@ namespace NoZ.Platform.IOS {
         private double maxElapsed = 0;
         private double avgElapsed = 0;
 
-
-        protected override void Show() {
-            
-        }
-
-        private Vector2 ViewToWindow (UITouch touch) {
+        private Vector2 ViewToWindow(UITouch touch)
+        {
             var point = touch.LocationInView(_view);
             var scale = UIScreen.MainScreen.Scale;
             return new Vector2((float)(point.X * scale), (float)(point.Y * scale));
         }
 
-        internal void OnTouchesBegan(NSSet touches) {
-            foreach (var touch in touches) {
+#if false
+        internal void OnTouchesBegan(NSSet touches)
+        {
+            foreach (var touch in touches)
+            {
                 var uitouch = touch as UITouch;
                 if (null == uitouch) continue;
                 Raise(TouchBegan, (ulong)uitouch.Handle.ToInt64(), ViewToWindow(uitouch), (int)uitouch.TapCount);
             }
         }
 
-        internal void OnTouchesEnded (NSSet touches) {
-            foreach (var touch in touches) {
+        internal void OnTouchesEnded(NSSet touches)
+        {
+            foreach (var touch in touches)
+            {
                 var uitouch = touch as UITouch;
                 if (null == uitouch) continue;
                 Raise(TouchEnded, (ulong)uitouch.Handle.ToInt64(), ViewToWindow(uitouch), (int)uitouch.TapCount);
             }
         }
 
-        internal void OnTouchesCancelled (NSSet touches) {
-            foreach (var touch in touches) {
+        internal void OnTouchesCancelled(NSSet touches)
+        {
+            foreach (var touch in touches)
+            {
                 var uitouch = touch as UITouch;
                 if (null == uitouch) continue;
                 Raise(TouchCancelled, (ulong)uitouch.Handle.ToInt64(), ViewToWindow(uitouch), (int)uitouch.TapCount);
             }
         }
 
-        internal void OnTouchesMoved (NSSet touches) {
-            foreach (var touch in touches) {
+        internal void OnTouchesMoved(NSSet touches)
+        {
+            foreach (var touch in touches)
+            {
                 var uitouch = touch as UITouch;
                 if (null == uitouch) continue;
                 Raise(TouchMoved, (ulong)uitouch.Handle.ToInt64(), ViewToWindow(uitouch), (int)uitouch.TapCount);
             }
         }
 
-        protected override void SetCursor(Cursor cursor) {
+        protected override void SetCursor(Cursor cursor)
+        {
             // TODO: IOS doesnt have cursors so just ignore the call.
         }
+#endif
     }
 }
