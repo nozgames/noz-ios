@@ -36,9 +36,9 @@ namespace NoZ.Platform.IOS
 {
     internal class NozView : GLKView
     {
-        private IOSGameWindow _window;
+        private IOSWindow _window;
 
-        internal NozView(IOSGameWindow window, CoreGraphics.CGRect rect) : base(rect)
+        internal NozView(IOSWindow window, CoreGraphics.CGRect rect) : base(rect)
         {
             _window = window;
         }
@@ -83,7 +83,7 @@ namespace NoZ.Platform.IOS
         }
     }
 
-    internal class IOSGameWindow : IWindowDriver
+    internal class IOSWindow : IWindowDriver
     {
         public EAGLContext GLContext {
             get; set;
@@ -100,7 +100,7 @@ namespace NoZ.Platform.IOS
         private NozView _view;
         private Vector2Int _displaySize;
 
-        public IOSGameWindow(AppDelegate appDelegate)
+        public IOSWindow(IOSAppDelegate appDelegate)
         {
             _displaySize = new Vector2Int(
                 (int)UIScreen.MainScreen.NativeBounds.Size.Width,
@@ -127,6 +127,8 @@ namespace NoZ.Platform.IOS
             _view.MultipleTouchEnabled = true;
             _view.UserInteractionEnabled = true;
             Window.AddSubview(_view);
+
+            Graphics.Driver = OpenGLDriver.Create();
 
             // Create render buffer..
             _renderBufferId = GL.GenRenderBuffer();

@@ -28,9 +28,12 @@ namespace NoZ.Platform.IOS
 {
     public static class IOSApplication
     {
-        public static void Run()
+        public static ApplicationDelegate Delegate { get; private set; }
+
+        public static void Run(string[] args, ApplicationDelegate applicationDelegate)
         {
-            UIApplication.Main(null, null, "IOSAppDelegate");
+            Delegate = applicationDelegate;
+            UIApplication.Main(args, null, "IOSAppDelegate");
         }
     }
 }
